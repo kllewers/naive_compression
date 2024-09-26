@@ -93,8 +93,9 @@ def convert_to_netcdf_cdf4(binary_file, hdr_file, output_nc_file):
     print(f"Saved compressed NetCDF4-CDF4 file to: {output_nc_file}")
 
 # Example usage
-binary_file = '/Users/kitlewers/Desktop/naive_compression/imagery/ang20231109t092617_027_L2A_OE_main_27577724_RFL_ORT'  # Replace with your binary file path
-hdr_file = '/Users/kitlewers/Desktop/naive_compression/imagery/ang20231109t092617_027_L2A_OE_main_27577724_RFL_ORT.hdr'  # Replace with your header file path
-output_nc_file = '/Users/kitlewers/Desktop/naive_compression/imagery/output_data.nc'
+if __name__ == "__main__":
+    binary_file = '/Users/kitlewers/Desktop/naive_compression/imagery/ang20231109t092617_027_L2A_OE_main_27577724_RFL_ORT'  # Replace with your binary file path
+    hdr_file = '/Users/kitlewers/Desktop/naive_compression/imagery/ang20231109t092617_027_L2A_OE_main_27577724_RFL_ORT.hdr'  # Replace with your header file path
+    output_nc_file = '/Users/kitlewers/Desktop/naive_compression/imagery/output_data.nc'
 
-convert_to_netcdf_cdf4(binary_file, hdr_file, output_nc_file)
+    convert_to_netcdf_cdf4(binary_file, hdr_file, output_nc_file)
