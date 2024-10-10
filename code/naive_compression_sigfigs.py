@@ -60,22 +60,18 @@ def load_binary_file(binary_file, hdr_metadata):
 
     return data
 
-def round_to_significant_figures(data):
+def round_to_significant_figures(data, sig_figs):
     """Round data to the specified number of significant figures."""
     abs_data = np.abs(data)
     with np.errstate(divide='ignore', invalid='ignore'):  # Handle log10 for zero values
         order_of_magnitude = np.floor(np.log10(abs_data))
         order_of_magnitude[np.isinf(order_of_magnitude)] = 0  # Handle zero values
     
-    factor = np.power(10000, order_of_magnitude - 1)
+    factor = np.power(10, sig_figs - order_of_magnitude - 1)
     
     # Round the data
     rounded_data = np.round(data * factor) / factor
     return rounded_data
-
-def convert_to_int(data):
-    """Convert float data to integers by rounding to the nearest integer."""
-    return np.round(data).astype(int)
 
 def convert_to_netcdf_cdf4(binary_file, hdr_file, output_nc_file):
     """Convert binary and .hdr file data to a compressed NetCDF4-CDF4 file."""
@@ -86,10 +82,7 @@ def convert_to_netcdf_cdf4(binary_file, hdr_file, output_nc_file):
     data = load_binary_file(binary_file, hdr_metadata)
 
     # Round data to 4 significant figures
-    data = round_to_significant_figures(data, 3)
-
-    # Convert data to integers
-    data = convert_to_int(data)
+    data = round_to_significant_figures(data, 4)
 
     # Convert to xarray Dataset
     ds = xr.Dataset(
@@ -99,7 +92,7 @@ def convert_to_netcdf_cdf4(binary_file, hdr_file, output_nc_file):
             "y": np.arange(data.shape[1]),
             "x": np.arange(data.shape[2])
         },
-        attrs={"description": "Binary data converted to NetCDF4-CDF4 with 4 significant figures and integer conversion"}
+        attrs={"description": "Binary data converted to NetCDF4-CDF4 with 4 significant figures"}
     )
 
     # Set compression settings for NetCDF4-CDF4
@@ -107,18 +100,19 @@ def convert_to_netcdf_cdf4(binary_file, hdr_file, output_nc_file):
         'data': {
             'zlib': True,       # Use zlib compression
             'complevel': 5,     # Set compression level (1-9)
-            'shuffle': True     # Enable shuffle filter to improve compression efficiency
+            'shuffle': True,     # Enable shuffle filter to improve compression efficiency
+            'chunksizes' : (1, 100, 100) #chunk one band at a time at 100 x 100 pixels
         }
     }
 
     # Save the dataset to NetCDF4-CDF4
-    ds.to_netcdf(output_nc_file, format='NETCDF4_CLASSIC', encoding=compression)
+    ds.to_netcdf(output_nc_file, format='NETCDF4', encoding=compression)
     print(f"Saved compressed NetCDF4-CDF4 file to: {output_nc_file}")
 
 # Example usage
 if __name__ == "__main__":
     binary_file = '/Users/kitlewers/Desktop/naive_compression/imagery/ang20231109t092617_027_L2A_OE_main_27577724_RFL_ORT'  # Replace with your binary file path
     hdr_file = '/Users/kitlewers/Desktop/naive_compression/imagery/ang20231109t092617_027_L2A_OE_main_27577724_RFL_ORT.hdr'  # Replace with your header file path
-    output_nc_file = '/Users/kitlewers/Desktop/naive_compression/imagery/int_output_data.nc'
+    output_nc_file = '/Users/kitlewers/Desktop/naive_compression/imagery/output_data_four_sigfigs.nc'
 
     convert_to_netcdf_cdf4(binary_file, hdr_file, output_nc_file)

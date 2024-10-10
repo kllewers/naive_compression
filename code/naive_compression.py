@@ -84,18 +84,19 @@ def convert_to_netcdf_cdf4(binary_file, hdr_file, output_nc_file):
         'data': {
             'zlib': True,       # Use zlib compression
             'complevel': 5,     # Set compression level (1-9)
-            'shuffle': True     # Enable shuffle filter to improve compression efficiency
+            'shuffle': True,     # Enable shuffle filter to improve compression efficiency
+            'chunksizes' : (1, 100, 100) #chunk one band at a time at 100 x 100 pixels
         }
     }
 
     # Save the dataset to NetCDF4-CDF4
-    ds.to_netcdf(output_nc_file, format='NETCDF4_CLASSIC', encoding=compression)
+    ds.to_netcdf(output_nc_file, format='NETCDF4', encoding=compression)
     print(f"Saved compressed NetCDF4-CDF4 file to: {output_nc_file}")
 
 # Example usage
 if __name__ == "__main__":
     binary_file = '/Users/kitlewers/Desktop/naive_compression/imagery/ang20231109t092617_027_L2A_OE_main_27577724_RFL_ORT'  # Replace with your binary file path
     hdr_file = '/Users/kitlewers/Desktop/naive_compression/imagery/ang20231109t092617_027_L2A_OE_main_27577724_RFL_ORT.hdr'  # Replace with your header file path
-    output_nc_file = '/Users/kitlewers/Desktop/naive_compression/imagery/output_data.nc'
+    output_nc_file = '/Users/kitlewers/Desktop/naive_compression/imagery/naive_compression.nc'
 
     convert_to_netcdf_cdf4(binary_file, hdr_file, output_nc_file)
