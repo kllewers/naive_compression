@@ -1,1 +1,0 @@
-#Now to try it with my dumb mosaics (and then with JPL's when they are done)
